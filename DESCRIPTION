@@ -1,0 +1,34 @@
+Package: dragonfarm
+Title: Fine-Tune Small Language Models with LoRA from R
+Version: 0.3.3
+Authors@R: 
+    person("Tejas", "Patel", role = c("aut", "cre"), email = "algocrat@gmail.com")
+Description: Fine-tune small (100M to 3B parameter) causal language models
+    with LoRA (Low-Rank Adaptation) from R. Datasets are mapped to
+    chat-format prompts and responses, training runs in a background
+    'Python' process built on Hugging Face 'transformers' and 'peft', and a
+    'shiny' app offers drag-and-drop dataset upload and column mapping.
+    'Python' dependencies are declared through 'reticulate' and resolved
+    automatically on first use.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1)
+Imports: bslib (>= 0.6.0), cli, glue, jsonlite, plotly, processx, ps,
+        reticulate (>= 1.41.0), rlang, shiny (>= 1.8.0), sortable,
+        stats, tools, utils, withr, zip
+Suggests: arrow, ellmer, httr2, knitr, pkgload, rmarkdown, testthat (>=
+        3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+SystemRequirements: 'Python' (>= 3.10). The 'uv' tool is installed
+        automatically by 'reticulate' to build the 'Python'
+        environment.
+URL: https://github.com/tejas4patel/dragon-farm
+BugReports: https://github.com/tejas4patel/dragon-farm/issues
+Config/roxygen2/version: 8.1.0
+NeedsCompilation: no
+Packaged: 2026-09-27 23:49:15 UTC; Tejas
+Author: Tejas Patel [aut, cre]
+Maintainer: Tejas Patel <algocrat@gmail.com>
+Repository: CRAN
+Date/Publication: 2026-10-07 09:50:22 UTC

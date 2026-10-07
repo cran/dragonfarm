@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Quickstart: fine-tune a small model from R</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Quickstart: fine-tune a small model from
+R</h1>
+
+
+
+<p>This walks through one complete fine-tune: a support-ticket dataset,
+a 135M parameter model that trains on a CPU in minutes, and a
+before-and-after comparison. Swap in your own file and a bigger model
+afterwards.</p>
+<div id="check-the-machine" class="section level2">
+<h2>1. Check the machine</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dragonfarm)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">dragon_check</span>()</span></code></pre></div>
+<p>The first call builds a Python environment with torch and
+transformers. That is a 2 to 3 GB download and takes a few minutes.
+Later calls take a second. The report tells you which device training
+will use. A CPU is fine for the 135M and 360M models. Anything larger
+wants a GPU.</p>
+</div>
+<div id="load-and-map-the-data" class="section level2">
+<h2>2. Load and map the data</h2>
+<p>A dataset is a table with one row per example. The bundled example
+has <code>subject</code>, <code>body</code>, <code>product</code>, and
+<code>reply</code> columns.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>ds <span class="ot">&lt;-</span> <span class="fu">dragon_dataset</span>(<span class="fu">dragon_example_data</span>())</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>ds</span></code></pre></div>
+<p><code>dragon_map()</code> says which columns form the user turn and
+the assistant turn. Each argument is a column name or a template that
+combines columns.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>ds <span class="ot">&lt;-</span> <span class="fu">dragon_map</span>(ds,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">prompt =</span> <span class="st">&quot;{subject}</span><span class="sc">\n\n</span><span class="st">{body}&quot;</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">response =</span> <span class="st">&quot;reply&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">system =</span> <span class="st">&quot;You are a support agent for a smart-home company. Be concrete and brief.&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">dragon_preview</span>(ds, <span class="at">n =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p>The system argument here is a constant. It could also be a
+column.</p>
+</div>
+<div id="train" class="section level2">
+<h2>3. Train</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>run <span class="ot">&lt;-</span> <span class="fu">dragon_train</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  ds,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;HuggingFaceTB/SmolLM2-135M-Instruct&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">lora =</span> <span class="fu">dragon_lora</span>(<span class="at">r =</span> <span class="dv">8</span>, <span class="at">alpha =</span> <span class="dv">16</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">args =</span> <span class="fu">dragon_train_args</span>(<span class="at">epochs =</span> <span class="dv">2</span>, <span class="at">batch_size =</span> <span class="dv">4</span>, <span class="at">grad_accum =</span> <span class="dv">2</span>, <span class="at">max_seq_len =</span> <span class="dv">512</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">wait =</span> <span class="cn">TRUE</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>)</span></code></pre></div>
+<p>With <code>wait = TRUE</code> you get a progress bar and the function
+returns when training ends. Without it, the function returns at once and
+you poll:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>run <span class="ot">&lt;-</span> <span class="fu">dragon_train</span>(ds, <span class="st">&quot;HuggingFaceTB/SmolLM2-135M-Instruct&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">dragon_status</span>(run)<span class="sc">$</span>state</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">tail</span>(<span class="fu">dragon_progress</span>(run))</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">dragon_logs</span>(run, <span class="dv">10</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">dragon_wait</span>(run)</span></code></pre></div>
+<p>Runs are directories under <code>dragonfarm_runs/</code>. They
+survive the R session:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">dragon_runs</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>run <span class="ot">&lt;-</span> <span class="fu">dragon_run</span>(<span class="fu">dragon_runs</span>()<span class="sc">$</span>dir[<span class="dv">1</span>])</span></code></pre></div>
+</div>
+<div id="evaluate-and-try-it" class="section level2">
+<h2>4. Evaluate and try it</h2>
+<p>Training holds out 5 percent of rows and reports loss and perplexity
+on them, plus a few generated replies next to the reference replies.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>ev <span class="ot">&lt;-</span> <span class="fu">dragon_evaluate</span>(run)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>ev</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>ev<span class="sc">$</span>samples</span></code></pre></div>
+<p>Compare the tuned model with the base model on a fresh prompt:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>prompt <span class="ot">&lt;-</span> <span class="st">&quot;Charged twice for Sentry doorbell</span><span class="sc">\n\n</span><span class="st">My card shows two charges for one order.&quot;</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">dragon_generate</span>(run, prompt, <span class="at">temperature =</span> <span class="dv">0</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">dragon_generate</span>(run, prompt, <span class="at">temperature =</span> <span class="dv">0</span>, <span class="at">base =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="ship-it" class="section level2">
+<h2>5. Ship it</h2>
+<p>The adapter alone is small and loads with <code>peft</code>. For a
+standalone model that needs neither peft nor dragonfarm, merge:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>merged <span class="ot">&lt;-</span> <span class="fu">dragon_merge</span>(run, <span class="st">&quot;models/support-135m&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">dragon_generate</span>(merged, prompt)</span></code></pre></div>
+<p>To reproduce the run later, or share it, ask for the code:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">dragon_code</span>(run))</span></code></pre></div>
+</div>
+<div id="choosing-settings" class="section level2">
+<h2>Choosing settings</h2>
+<ul>
+<li><strong>Model.</strong> Start with
+<code>HuggingFaceTB/SmolLM2-360M-Instruct</code> or
+<code>Qwen/Qwen2.5-0.5B-Instruct</code>. Move up only if quality is not
+enough.</li>
+<li><strong>Rank.</strong> 8 to 16 is plenty for format and tone. Go to
+32 or 64 when the model must learn a lot of new facts.</li>
+<li><strong>Learning rate.</strong> <code>2e-4</code> for LoRA. Halve it
+if the loss curve is jagged.</li>
+<li><strong>Epochs.</strong> 2 to 3. Watch the eval loss: if it rises
+while train loss keeps falling, you are overfitting.</li>
+<li><strong>Sequence length.</strong> Set it just above your longest
+example. Shorter is faster and uses less memory.</li>
+<li><strong>Out of memory.</strong> Lower <code>batch_size</code>, raise
+<code>grad_accum</code> to compensate, and turn on
+<code>gradient_checkpointing</code>.</li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
