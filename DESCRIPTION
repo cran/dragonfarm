@@ -1,6 +1,6 @@
 Package: dragonfarm
 Title: Fine-Tune Small Language Models with LoRA from R
-Version: 0.3.3
+Version: 0.3.4
 Authors@R: 
     person("Tejas", "Patel", role = c("aut", "cre"), email = "algocrat@gmail.com")
 Description: Fine-tune small (100M to 3B parameter) causal language models
@@ -27,8 +27,8 @@ URL: https://github.com/tejas4patel/dragon-farm
 BugReports: https://github.com/tejas4patel/dragon-farm/issues
 Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-09-27 23:49:15 UTC; Tejas
+Packaged: 2026-10-12 12:21:32 UTC; Tejas
 Author: Tejas Patel [aut, cre]
 Maintainer: Tejas Patel <algocrat@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-10-07 09:50:22 UTC
+Date/Publication: 2026-10-12 13:31:00 UTC

@@ -1,7 +1,7 @@
-17cae1eecb1c4eb873a02367acb0d11a *DESCRIPTION
+6f1182200b2787576107a49f09667a76 *DESCRIPTION
 869704560c18915e37e24eb5019fbb27 *LICENSE
 e22742b655a2c11f18c671acf8c06582 *NAMESPACE
-25e74a574e6400934b5a7804aeef3c5b *NEWS.md
+c62d3e77a79620833757e354b368a808 *NEWS.md
 5e40fad3bc328e89b3fe0dd769925e7c *R/app.R
 10d7193d389528a5a6995e7fd6a965a1 *R/backend.R
 796fc5af261d07645057c24255783196 *R/chat.R
@@ -165,7 +165,7 @@ b9cee34a3b8320ea738ece51c624b77d *tests/testthat/test-pairs.R
 61265eebfa0a7c09d918058cff804d22 *tests/testthat/test-publish.R
 1e7b7c5f0c659fb8f779bb2ea0558585 *tests/testthat/test-reinforce.R
 e3e83123cfbead79971c77ba9243c46d *tests/testthat/test-remote.R
-f48e02a75f702da5f386f4140e54b966 *tests/testthat/test-run.R
+208aeebc7ca29838df64f67e418c139b *tests/testthat/test-run.R
 dc8195949563116fd51ee04f02e42fea *tests/testthat/test-synth.R
 83e8ab51365cd9ecd208c6f4205be547 *tests/testthat/test-train.R
 e026d18817b1b835325ccfcbfef36bf2 *tests/testthat/test-tryit-module.R
